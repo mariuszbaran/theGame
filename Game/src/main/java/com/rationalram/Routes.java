@@ -19,7 +19,7 @@ public class Routes {
 
 	public void init() {
 		
-		File file = new File("C:\\Users\\MariuszBaran\\eclipse-workspace\\Game\\src\\main\\java\\com\\rationalram\\routes.csv");
+		File file = new File("C:\\Users\\MariuszBaran\\git\\theGame\\Game\\src\\main\\java\\com\\rationalram\\routes.csv");
 		try {
 			Scanner scanner = new Scanner(file);
 			String header = scanner.nextLine();

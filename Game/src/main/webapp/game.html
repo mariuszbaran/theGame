@@ -14,7 +14,7 @@ function stopInterval() {
 function startInterval(){
 	var interval = setInterval(function() { 
 		sync_data();	
-	}, 1000);
+	}, 2000);
 }
 
 
@@ -57,19 +57,20 @@ function check_color(value){
 function clear(){
 	$.each($(".clickable"), function( index, value ) {
 		var id = (value.getAttribute("id"));
-		if(id.includes("singleTicket")){
-			$("#"+id).hide();	
-		}
-		if(id.includes("openCardSpecial")){
-			$("#"+id).hide()
-		}
-		if(id.includes("conn")){
-			$("#"+id).hide();
-		}
-		$("#newCardGroup").hide();
-		$("#bdGroup").hide();
-		
+		//if(id.includes("singleTicket")){
+			//$("#"+id).hide();
+		//}
+		//if(id.includes("openCardSpecial")){
+			//$("#"+id).hide();
+		//}
+		//if(id.includes("conn")){
+			//$("#"+id).hide();
+		//}
 	});
+	
+	$("#newCardGroup").hide();
+	$("#bdGroup").hide();
+	$("#conf-accept").hide();
 
 	$("#player0").hide();
 	$("#player1").hide();
