@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Game</title>
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
+<script>
+
+function stopInterval() {
+	  clearInterval(interval);
+}
+
+function startInterval(){
+	var interval = setInterval(function() { 
+		sync_data();	
+	}, 1000);
+}
+
+
+function check_color(value){
+	var color;
+	switch(value) {
+	  case "black":
+	    color = "#1a1a1a";
+	    break;
+	  case "red":
+	    color = "#fb3135";
+	    break;
+	  case "orange":
+		  color = "#ff922a";
+		  break;
+	  case "yellow":
+		  color = "#ffef1b";
+		  break;
+	  case "blue":
+		  color = "#5551ff";
+		  break;
+	  case "green":
+		  color = "#2ad42a";
+		  break;
+	  case "pink":
+		  color = "#d31eeb";
+		  break;
+	  case "white":
+		  color = "#e6e6e6";
+		  break;
+	  case "none":
+		  color = "#9393ac";
+		  break;
+	  default:
+	}
+	return color;
+}
+
+
+function clear(){
+	$.each($(".clickable"), function( index, value ) {
+		var id = (value.getAttribute("id"));
+		if(id.includes("singleTicket")){
+			$("#"+id).hide();	
+		}
+		if(id.includes("openCardSpecial")){
+			$("#"+id).hide()
+		}
+		if(id.includes("conn")){
+			$("#"+id).hide();
+		}
+		$("#newCardGroup").hide();
+		$("#bdGroup").hide();
+		
+	});
+
+	$("#player0").hide();
+	$("#player1").hide();
+	$("#player2").hide();
+	$("#player3").hide();
+	$("#player4").hide();
+	
+	$("#bdColorBg").css("fill",check_color("none"));
+	
+	
+}
+
+
+function update(response){
+	
+	/*
+	if(response.newCard === "special"){
+		$("#newCardSpecial").show();
+		$("#newCardGroup").show();
+	if(response.newCard){
+		$("#newCardColor").css("fill",check_color("red"));
+		$("#newCardGroup").show();
+		$("#newCardGroup").delay(3000).fadeOut();
+	}
+	*/
+	
+	
+	$("#gameId").text(response.gameId);
+	$("#alert").text(response.alert);
+	$("#tableDeckTotal").text(response.tableDeckTotal);
+	$("#shortTicketTotal").text(response.shortTicketTotal);
+	$("#usedDeckTotal").text(response.usedDeckTotal);
+	
+	$.each(response.openCardList, function( index, value ) {
+		if(response.openCardList[index]!="empty"){
+			if(response.openCardList[index]=="special"){
+				$("#openCardSpecial"+index).show();
+			}else{
+				var color = check_color(value);
+				$("#openCard"+index).css("fill",color);
+				$("#openCard"+index).show();
+			}	
+		}else{
+			$("#openCard"+index).hide();
+			$("#openCardSpecial"+index).hide();
+		}	
+	});
+	
+	$.each(response.playerList, function( index, value ) {
+			$("#nameP"+index).text(value[0]);
+			$("#pointsP"+index).text(value[1]);
+			$("#cardsP"+index).text(value[2]);
+			$("#pawnsP"+index).text(value[3]);
+			$("#interchP"+index).text(value[4]);
+			var active = value[5];
+		if(active === "true"){
+			$("#activeP"+index).show();
+		}else{
+			$("#activeP"+index).hide();
+		};
+		var color = check_color(value[6])
+		$("#colorP"+index).css("fill",color);
+		$("#player"+index).show();
+	});
+	
+	$.each(response.routes, function( index, value ) {
+		if(value[1]==="-1"){
+			$("#conn"+value[0]).css("display","none");
+		}else{
+			$("#conn"+value[0]).css("display","block");	
+			$("#conn"+value[0]).css("fill", check_color(value[1]));
+		}	
+	});
+	
+	if(response.actionMode === "buildingConn"){
+		$("#bdGroup").show();
+	}else{
+		$("#bdGroup").hide();
+	}
+	$("#bdColor").text(response.bdColor);
+	$("#bdSpecial").text(response.bdSpecial);
+	$("#bdColorBg").css("fill",check_color(response.bdColorBg));	
+	
+	$("#myColor").css("fill",check_color(response.color));
+	$("#myBlack").text(response.blackCards);			
+	$("#myRed").text(response.redCards);
+	$("#myOrange").text(response.orangeCards);
+	$("#myYellow").text(response.yellowCards);
+	$("#myBlue").text(response.blueCards);
+	$("#myGreen").text(response.greenCards);
+	$("#myPink").text(response.pinkCards);
+	$("#myWhite").text(response.whiteCards);
+	$("#mySpecial").text(response.specialCards);
+	$("#myInterchange").text(response.interchangeCards);
+	
+	$.each(response.tempTicketsList, function( index, value ) {
+		$("#"+value).show();
+		$("#"+value).css("stroke","red");
+	});
+	
+	$.each(response.shortTicketsList, function( index, value ) {
+		$("#"+value).show();
+		$("#"+value).css("stroke","black");
+	});
+	
+	if(response.acceptActive === "true"){
+		$("#conf-accept").css("display","block");
+	}else{
+		$("#conf-accept").css("display","none");
+	}
+
+}
+
+
+function send_id(obj_id){
+	$.ajax({	
+		url: "GameSync",
+		type: "POST",
+		data: {id: obj_id},
+		success: function(response) {    
+			if(response === "Not your turn"){
+				alert(response);
+			}
+			sync_data();
+		}
+	});	
+}
+
+
+
+$(document).ready(function() {
+	sync_data();
+	$('#main').load('svg.svg');
+
+});
+
+function sync_data(){
+	$.ajax({
+		url: "GameSync",		
+		type: "GET",
+		dataType: "json",
+		data: {},
+		success: function(response) {		
+			clear();
+			update(response);
+		}
+	});
+}
+
+$( document ).ready(function() {
+	startInterval();
+});
+
+
+
+$(document).on('click', ".clickable", function() {
+	//$(".clickable").click(function(){
+		var clicked_obj = $(this).attr('id');
+		send_id(clicked_obj);
+	});
+		
+
+
+
+</script>
+
+<style>
+#main {
+	width: 100%;
+	height: 100vh;
+	overflow: auto;
+	text-align: center;
+	background-color: #24494b;
+	background-image: url("water_bump_map.png");
+	background-size: 50px auto;
+	background-position: left top;
+}
+</style>
+
+
+</head>
+
+<body>
+
+	<div id=main></div>
+
+
+</body>
+</html>

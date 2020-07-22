@@ -1,0 +1,17 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	<servlet>
+		<servlet-name>GameSync</servlet-name>
+		<display-name>GameSync</display-name>
+		<description></description>
+		<servlet-class>com.rationalram.GameSync</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GameSync</servlet-name>
+		<url-pattern>/GameSync</url-pattern>
+	</servlet-mapping>
+</web-app>
